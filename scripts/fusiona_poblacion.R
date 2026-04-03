@@ -1,3 +1,22 @@
+# --------------------------------------------------------------
+# Script de procesamiento de datos poblacionales (INE, 2018–2026)
+# --------------------------------------------------------------
+# Este script lee, limpia y combina datos de población residente 
+# publicados por el INE para los años 2018 a 2026. 
+# 
+# FUNCIONALIDAD:
+# 1. Importa dos ficheros Excel con datos poblacionales:
+#      - Un archivo específico para 2026.
+#      - Un archivo que contiene series para 2018–2025.
+# 2. Limpia y transforma ambos conjuntos de datos para estandarizar
+#    sus estructuras, corrigiendo cabeceras, generando columnas de año,
+#    y pasando de formato ancho a formato largo.
+# 3. Combina las series históricas y la información de 2026 en una 
+#    única tabla homogénea con columnas:
+#         Comunidad | Año | Tipo (Total/Española/Extranjera) | Valor
+# 4. Exporta el resultado final a un archivo Excel listo para análisis
+#    o visualización.
+
 library(tidyverse)
 library(readxl)
 library(here)
@@ -11,32 +30,6 @@ library(writexl)
 # Resultados Definitivos: https://www.ine.es/up/wcZCtfesiA
 # Población residente por fecha, sexo, grupo de edad y nacionalidad	 (española/extranjera)
 # Resultados provisionales: https://www.ine.es/up/WYXEwuL5i6
-
-# ----------------------------------------------
-# Listado de comunidades segun la nomenclatura del INE
-# ----------------------------------------------
-comunidades <- c(
-  "Total Nacional",
-  "01 Andalucía",
-  "02 Aragón",
-  "03 Asturias, Principado de",
-  "04 Balears, Illes",
-  "05 Canarias",
-  "06 Cantabria",
-  "07 Castilla y León",
-  "08 Castilla - La Mancha",
-  "09 Cataluña",
-  "10 Comunitat Valenciana",
-  "11 Extremadura",
-  "12 Galicia",
-  "13 Madrid, Comunidad de",
-  "14 Murcia, Región de",
-  "15 Navarra, Comunidad Foral de",
-  "16 País Vasco",
-  "17 Rioja, La",
-  "18 Ceuta",
-  "19 Melilla"
-)
 
 # ---------------------------
 # 1. Leer ficheros desde data/input

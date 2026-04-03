@@ -11,4 +11,4 @@ Los nombres de las variables siguen las reglas descritas a continuación:
 * Uso del singular. Cada columna representa una unidad de observación (ej. comunidad_autónoma).
 * Caracteres latinos. Los nombres se acentúan y se usa la `ñ` (ej. comunidad_autónoma, año).
 * Se evitan abreviaturas ambiguas. Solo se usan cuando sean estándar o claramente entendibles (ej. lat, lon).
-* Nombres consistentes. Se emplea `Valor` en todas las columnas donde hay datos numéricos.
+* Nombres consistentes. Se emplea `valor` en todas las columnas donde hay datos numéricos.

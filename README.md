@@ -1,5 +1,5 @@
-# periodismo-de-datos
-Conjuntos de datos y script para realizar prácticas de periodismo de datos
+# Periodismo de datos
+Conjuntos de datos y _scripts_ para realizar prácticas de periodismo de datos
 
 ## Guía de formato para los conjuntos de datos
 

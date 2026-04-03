@@ -1,3 +1,20 @@
+# --------------------------------------------------------------
+# Script de procesamiento de viviendas (Fomento, 2018–2026)
+# --------------------------------------------------------------
+# Este script procesa los datos del antiguo Ministerio de Fomento sobre el
+# número de viviendas libres iniciadas y terminadas en España.
+#
+# FUNCIONALIDAD:
+#  1. Toma como entrada dos ficheros Excel con datos de 1991–2025.
+#      - Un archivo con la serie anual de viviendas iniciadas.
+#      - Un archivo con la serie anual de viviendas terminadas
+#  2. Extrae los nombres de columna desde una fila interna de cada fichero.
+#  3. Limpia los datos conservando únicamente las comunidades autónomas válidas.
+#  4. Transforma los datasets al formato largo (long format).
+#  5. Fusiona ambas series por región y año.
+#  6. Exporta un fichero XLSX final preparado para análisis posteriores.
+
+
 library(tidyverse)
 library(readxl)
 library(writexl)

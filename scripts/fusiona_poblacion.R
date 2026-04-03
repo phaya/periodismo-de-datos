@@ -13,7 +13,7 @@
 #    y pasando de formato ancho a formato largo.
 # 3. Combina las series históricas y la información de 2026 en una 
 #    única tabla homogénea con columnas:
-#         Comunidad | Año | Tipo (Total/Española/Extranjera) | Valor
+#         comunidad_autónoma | año | tipo (Total/Española/Extranjera) | valor
 # 4. Exporta el resultado final a un archivo Excel listo para análisis
 #    o visualización.
 
@@ -48,22 +48,22 @@ df_2018_2025_raw <- read_excel(file_2018_2025, sheet = 1, skip = 6)
 df_2026 <- df_2026_raw %>% 
   # Limpia los nombres de columnas en 2026
   rename(
-    Comunidad = ...1,
+    comunidad_autónoma = ...1,
     Total = Total...2,
     Española = Total...3,
     Extranjera = Total...4
   ) %>%
-  mutate(Año = 2026) %>%
+  mutate(año = 2026) %>%
   # Elimina las dos primeras filas del Excel (cabeceras descriptivas)
   slice(-1, -2) %>%
   # Transforma de formato corto a largo
   pivot_longer(
     cols = c(Total, Española, Extranjera),
-    names_to = "Tipo",
-    values_to = "Valor"
+    names_to = "tipo",
+    values_to = "valor"
   ) %>%
-  select(Comunidad, Año, Tipo, Valor) %>%
-  filter(!is.na(Valor))
+  select(comunidad_autónoma, año, tipo, valor) %>%
+  filter(!is.na(valor))
 
 # ---------------------------
 # 3. Prepara la tabla de 2018-actualidad
@@ -79,25 +79,25 @@ years <- df_2018_2025_raw[2, -1] %>% unlist() %>% as.character()
 years <- str_extract(years, "\\d{4}") %>% as.numeric()
 
 # ----------------------------
-# 3.2 Filtrar filas útiles (comunidades + valores)
+# 3.2 Filtrar filas útiles (comunidad_autónomas + valores)
 # ----------------------------
 # Las comunidades aparecen cuando la primera columna NO es NA y no es "Total", "Española", "Extranjera"
 clean <- df_2018_2025_raw %>%
-  rename(Tipo = ...1) %>%
-  mutate(Comunidad = case_when(
-      !is.na(Tipo) & 
-      !Tipo %in% c("Total", "Española", "Extranjera") ~ Tipo,
+  rename(tipo = ...1) %>%
+  mutate(comunidad_autónoma = case_when(
+      !is.na(tipo) & 
+      !tipo %in% c("Total", "Española", "Extranjera") ~ tipo,
     TRUE ~ NA_character_
   )) %>%
-  fill(Comunidad, .direction = "down") %>%
+  fill(comunidad_autónoma, .direction = "down") %>%
   # Mantener solo filas que sean Total/Española/Extranjera
-  filter(Tipo %in% c("Total", "Española", "Extranjera"))
+  filter(tipo %in% c("Total", "Española", "Extranjera"))
 
 # ----------------------------
 # 3.3 Pasa de columnas anchas a largas
 # ----------------------------
 # Columnas que contienen los valores de los años
-year_cols <- setdiff(names(clean), c("Tipo", "Comunidad"))
+year_cols <- setdiff(names(clean), c("tipo", "comunidad_autónoma"))
 
 # years debe ser: c(2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018)
 
@@ -105,12 +105,12 @@ df_2018_2025 <- clean %>%
   pivot_longer(
     cols = all_of(year_cols),
     names_to = "Colname",
-    values_to = "Valor"
+    values_to = "valor"
   ) %>%
   mutate(
-    Año = years[ match(Colname, year_cols) ]
+    año = years[ match(Colname, year_cols) ]
   ) %>%
-  select(Comunidad, Año, Tipo, Valor)
+  select(comunidad_autónoma, año, tipo, valor)
 
 
 # ---------------------------
@@ -118,7 +118,7 @@ df_2018_2025 <- clean %>%
 # ---------------------------
 
 df_final <- bind_rows(df_2018_2025, df_2026) %>%
-            mutate(Valor = as.numeric(Valor))
+            mutate(valor = as.numeric(valor))
     
 # ---------------------------
 # 4. Exportar a Excel

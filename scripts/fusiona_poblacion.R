@@ -16,6 +16,7 @@
 #         comunidad_autónoma | año | tipo (Total/Española/Extranjera) | valor
 # 4. Exporta el resultado final a un archivo Excel listo para análisis
 #    o visualización.
+# --------------------------------------------------------------
 
 library(tidyverse)
 library(readxl)

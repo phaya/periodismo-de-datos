@@ -1,3 +1,25 @@
+# ------------------------------------------------------------------
+# Script para normalizar nombre de CC. AA. segun nomeclatura del INE
+# ------------------------------------------------------------------
+#
+# Este script lee un archivo Excel que contiene una columna
+# con nombres de comunidades autónomas (potencialmente con
+# errores, variantes o formatos no homogéneos) y genera una
+# versión normalizada utilizando los nombres oficiales del INE.
+#
+# FUNCIONALIDAD:
+# - Detecta automáticamente la columna de comunidad autónoma
+# - Limpia el texto (tildes, mayúsculas, puntuación, espacios)
+# - Asigna una comunidad canónica mediante Distancia de Levenshtein 
+#    (coincidencia más cercana)
+# - Crea nuevas columnas:
+#     * comunidad_autónoma_normalizada → nombre oficial INE
+#     * numero_cambios → distancia respecto al valor original
+#
+# Notas:
+# - La normalización es tolerante a errores tipográficos
+# ------------------------------------------------------------------
+
 library(readxl)
 library(writexl)
 library(dplyr)
@@ -6,9 +28,12 @@ library(purrr)
 library(here)
 
 # -------------------------------------------------------
-# Algoritmo Levenshtein implementado desde cero
+# Distancia de Levenshtein implementada desde cero
 # -------------------------------------------------------
 levenshtein <- function(a, b) {
+  a <- as.character(a)
+  b <- as.character(b)
+  
   a_chars <- unlist(strsplit(a, ""))
   b_chars <- unlist(strsplit(b, ""))
   
@@ -17,25 +42,39 @@ levenshtein <- function(a, b) {
   
   dist <- matrix(0, nrow = n + 1, ncol = m + 1)
   
-  dist[1:(n+1), 1] <- 0:n
-  dist[1, 1:(m+1)] <- 0:m
+  dist[, 1] <- 0:n
+  dist[1, ] <- 0:m
   
-  for (i in 2:(n+1)) {
-    for (j in 2:(m+1)) {
-      costo <- ifelse(a_chars[i-1] == b_chars[j-1], 0, 1)
+  for (i in 2:(n + 1)) {
+    for (j in 2:(m + 1)) {
+      costo <- ifelse(a_chars[i - 1] == b_chars[j - 1], 0, 1)
       dist[i, j] <- min(
-        dist[i-1, j] + 1,       # eliminación
-        dist[i, j-1] + 1,       # inserción
-        dist[i-1, j-1] + costo  # sustitución
+        dist[i - 1, j] + 1,        # eliminación
+        dist[i, j - 1] + 1,        # inserción
+        dist[i - 1, j - 1] + costo # sustitución
       )
     }
   }
   
-  dist[n+1, m+1]
+  dist[n + 1, m + 1]
 }
 
 # -------------------------------------------------------
-# Tabla oficial INE (conservar nombre sin código numérico)
+# Limpieza de texto para comparar mejor
+# -------------------------------------------------------
+limpiar_texto <- function(x) {
+  x <- as.character(x)
+  x <- trimws(x)
+  x <- iconv(x, from = "UTF-8", to = "ASCII//TRANSLIT")
+  x <- tolower(x)
+  x <- gsub("[[:punct:]]", " ", x)
+  x <- gsub("\\s+", " ", x)
+  x <- trimws(x)
+  x
+}
+
+# -------------------------------------------------------
+# Tabla oficial de comunidades
 # -------------------------------------------------------
 comunidades <- c(
   "Total Nacional",
@@ -60,59 +99,81 @@ comunidades <- c(
   "19 Melilla"
 )
 
-comunidades_limpias <- str_replace(comunidades, "^[0-9]{2} ", "")
+# Versión limpiada para comparar
+comunidades_ref <- limpiar_texto(comunidades)
 
 # -------------------------------------------------------
-# Función de normalización por distancia mínima
+# Devuelve:
+#   - comunidad canónica más cercana
+#   - distancia mínima (número de cambios)
 # -------------------------------------------------------
-normalizar_comunidad <- function(x, ref, umbral = 8) {
-  distancias <- sapply(ref, function(r) levenshtein(x, r))
-  
-  idx <- which.min(distancias)
-  dmin <- distancias[idx]
-  mejor <- ref[idx]
-  
-  if (dmin > umbral) {
-    warning(paste0("Advertencia: '", x, 
-                   "' no se normaliza (distancia = ", dmin, ")"))
-    return(x)
+normalizar_comunidad_info <- function(x, ref_original, ref_limpio) {
+  if (is.na(x) || trimws(as.character(x)) == "") {
+    return(list(
+      comunidad = NA_character_,
+      cambios = NA_integer_
+    ))
   }
   
-  mejor
+  x_limpio <- limpiar_texto(x)
+  
+  distancias <- sapply(ref_limpio, function(r) levenshtein(x_limpio, r))
+  idx <- which.min(distancias)
+  
+  list(
+    comunidad = ref_original[idx],
+    cambios = unname(distancias[idx])
+  )
 }
 
 # -------------------------------------------------------
-# PROCESO COMPLETO:
-#   1. Leer Excel
-#   2. Normalizar nombres
-#   3. Escribir nuevo Excel
+# Lee el Excel y añade:
+#   - comunidad_autónoma_ine
+#   - numero_cambios
 # -------------------------------------------------------
-normalizar_excel <- function(input_excel,
-                             hoja = 1,
-                             umbral = 8) {
-  
+normalizar_excel <- function(input_excel, hoja = 1) {
   df <- read_excel(input_excel, sheet = hoja)
   
-  if (!"Comunidad" %in% names(df)) {
-    stop("ERROR: el Excel debe incluir una columna llamada 'Comunidad'.")
+  print(names(df))
+  
+  posibles_nombres <- c(
+    "comunidad_autónoma",
+    "Comunidad autónoma",
+    "Comunidad",
+    "comunidad"
+  )
+  
+  col_encontrada <- intersect(posibles_nombres, names(df))
+  
+  if (length(col_encontrada) == 0) {
+    stop("ERROR: no encuentro la columna de comunidad autónoma.")
   }
+  
+  col_comunidad <- col_encontrada[1]
   
   df_normalizado <- df %>%
     mutate(
-      Comunidad_normalizada = map_chr(
-        Comunidad,
-        ~ normalizar_comunidad(.x, comunidades_limpias, umbral = umbral)
-      )
-    )
+      info_normalizacion = map(
+        .data[[col_comunidad]],
+        ~ normalizar_comunidad_info(.x, comunidades_limpias, comunidades_ref)
+      ),
+      comunidad_autónoma_ine = map_chr(info_normalizacion, "comunidad"),
+      numero_cambios = map_int(info_normalizacion, "cambios")
+    ) %>%
+    select(-info_normalizacion)
   
   return(df_normalizado)
 }
 
 # -------------------------------------------------------
-# EJEMPLO:
-# resultado <- normalizar_excel("entrada.xlsx", hoja = 1, 
-#                                umbral = 8)
+# EJECUCIÓN
 # -------------------------------------------------------
-df_normalizado <- normalizar_excel(here("data","viviendas_iniciadas_terminadas_españa_1991_2025.xlsx"))
-write_xlsx(df_normalizado, 
-           here("data","viviendas_iniciadas_terminadas_españa_1991_2025_norm.xlsx"))
+df_normalizado <- normalizar_excel(
+  here("data", "viviendas_iniciadas_terminadas_españa_1991_2025.xlsx"),
+  hoja = 1
+)
+
+write_xlsx(
+  df_normalizado,
+  here("data", "viviendas_iniciadas_terminadas_españa_1991_2025_norm.xlsx")
+)

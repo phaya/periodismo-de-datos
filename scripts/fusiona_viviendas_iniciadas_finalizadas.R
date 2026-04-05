@@ -13,7 +13,7 @@
 #  4. Transforma los datasets al formato largo (long format).
 #  5. Fusiona ambas series por región y año.
 #  6. Exporta un fichero XLSX final preparado para análisis posteriores.
-
+# --------------------------------------------------------------
 
 library(tidyverse)
 library(readxl)

@@ -173,7 +173,8 @@ df_normalizado <- normalizar_excel(
   hoja = 1
 )
 
-write_xlsx(
-  df_normalizado,
-  here("data", "viviendas_iniciadas_terminadas_españa_1991_2025_norm.xlsx")
-)
+df_normalizado %>%
+  select(-numero_cambios) %>%
+  write_xlsx(
+    here("data", "viviendas_iniciadas_terminadas_españa_1991_2025_norm.xlsx")
+  )

@@ -273,9 +273,26 @@ lee_normaliza_escribe(
   here("data", "viviendas_iniciadas_terminadas_españa_1991_2025_norm.xlsx")
 )
 
-df_normalizado <- 
-  lee_normaliza_escribe(
-    here("data/input", "2025-idealista_precio_vivienda_ccaa.xlsx"),
-    hoja = 1,
-    here("data", "2025-idealista_precio_vivienda_ccaa_norm.xlsx")
-  )
+lee_normaliza_escribe(
+  here("data/input", "2025-idealista_precio_vivienda_ccaa.xlsx"),
+  hoja = 1,
+  here("data", "2025-idealista_precio_vivienda_ccaa_norm.xlsx")
+)
+
+lee_normaliza_escribe(
+  here("data/input", "2018-idealista_precio_vivienda_ccaa.xlsx"),
+  hoja = 1,
+  here("data", "2018-idealista_precio_vivienda_ccaa_norm.xlsx")
+)
+
+lee_normaliza_escribe(
+  here("data/input", "2025-idealista_precio_alquiler_ccaa.xlsx"),
+  hoja = 1,
+  here("data", "2025-idealista_precio_alquiler_ccaa_norm.xlsx")
+)
+
+lee_normaliza_escribe(
+  here("data/input", "2018-idealista_precio_alquiler_ccaa.xlsx"),
+  hoja = 1,
+  here("data", "2018-idealista_precio_alquiler_ccaa_norm.xlsx")
+)

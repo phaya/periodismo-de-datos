@@ -84,13 +84,13 @@ salarios <- read_excel(
   filter(año %in% c(2018, 2025)) %>%
   group_by(comunidad_autónoma_ine, año) %>%
   summarise(
-    salario_medio_anual = mean(valor, na.rm = TRUE),
+    salario_medio_mensual = mean(valor, na.rm = TRUE),
     .groups = "drop"
   ) %>%
   pivot_wider(
     names_from = año,
-    values_from = salario_medio_anual,
-    names_prefix = "salario_medio_anual_"
+    values_from = salario_medio_mensual,
+    names_prefix = "salario_medio_mensual_"
   )
 
 # ---------------------------
@@ -148,9 +148,11 @@ df_final <- alquiler_2018 %>%
     precio_m2_2018, precio_m2_2025,
     alquiler_m2_2018, alquiler_m2_2025,
     hogares_en_alquiler_pct_2018, hogares_en_alquiler_pct_2025,
-    salario_medio_anual_2018, salario_medio_anual_2025,
+    salario_medio_mensual_2018, salario_medio_mensual_2025,
     población_2018, población_2025
-  )
+  ) %>%
+  arrange(comunidad_autónoma_ine) %>%
+  slice(1:17)
 
 # ---------------------------
 # 7. EXPORTACIÓN

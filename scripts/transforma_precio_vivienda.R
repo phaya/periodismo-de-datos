@@ -1,4 +1,3 @@
-
 # --------------------------------------------------------------
 # Script de preparación y normalización de datos de coste laboral
 # por trabajador y comunidades autónomas (INE, 2015–2025).
@@ -41,7 +40,7 @@ library(here)
 # 1. Leer ficheros desde data/input
 # ---------------------------
 df_raw <- read_excel(
-  here("data/input", "2015-2025-Coste laboral por trabajador, comunidad autónoma, sectores de actividad.xlsx"),
+  here("data/input", "2015-2025-Índice de Precios de Vivienda (IPV). Base 2015.xlsx"),
   col_names = FALSE,
   skip = 7
 )
@@ -59,9 +58,21 @@ nombres[is.na(nombres)] <- "comunidad_autónoma"
 # 3. Asignar nombres a la tabla
 names(df_raw) <- nombres
 
-# 4. Eliminar filas de cabecera (filas 1 y 2)
+# 4. Eliminar filas de cabecera (filas 1 y 2) y a partur fila 23
 df <- df_raw %>%
-      slice(-(1:2))
+  slice(-(1:2)) %>%
+  slice(-(21:n())) %>%
+  mutate(
+    comunidad_autónoma = if_else(
+      comunidad_autónoma == "Nacional",
+        "Total Nacional",
+        comunidad_autónoma
+    )
+  ) %>%
+  filter(
+    !comunidad_autónoma %in% c("18 Ceuta", "19 Melilla")
+  )
+
 
 # ---------------------------------------------------------
 # 4. Pasar a formato largo (tidy)
@@ -78,4 +89,4 @@ df_final <- df %>%
 # 5. Guardar XLSX final
 # ----------------------------------------------
 write_xlsx(df_final,
-           here("data", "coste_laboral_por_trabajador_ccaa_2025-2015.xlsx"))
+           here("data", "índice_precios_vivienda_2025-2015. Base 2015.xlsx"))

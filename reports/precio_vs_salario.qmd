@@ -1,0 +1,48 @@
+---
+title: "La vivienda frente a los salarios: una brecha que no deja de crecer"
+format: html
+output-dir: "../docs"
+editor: visual
+---
+
+Entre 2015 y 2025, el coste de la vivienda en España ha experimentado un crecimiento sostenido que no siempre ha ido acompañado por una evolución equivalente de los salarios. Partiendo de [enfoques previos](https://x.com/Jongonzlz/status/2033867769733693801?s=20){target="_blank" rel="noopener noreferrer"}, se ha comparado la evolución del precio de la vivienda y del salario bruto. El análisis utiliza índices reales (ajustados por inflación) para observar la evolución del poder adquisitivo de los hogares en relación con ambos indicadores.
+
+## Resultado
+
+::: {#chart-1}
+<iframe title="El precio de la vivienda crece muy por encima de los salarios y agrava la brecha de acceso en España" aria-label="Line chart" id="datawrapper-chart-m13eQ" src="https://datawrapper.dwcdn.net/m13eQ/1/" scrolling="no" frameborder="0" style="width: 0; min-width: 100% !important; border: none;" height="496" data-external="1">
+
+</iframe>
+
+<script type="text/javascript">window.addEventListener("message",function(a){if(void 0!==a.data["datawrapper-height"]){var e=document.querySelectorAll("iframe");for(var t in a.data["datawrapper-height"])for(var r,i=0;r=e[i];i++)if(r.contentWindow===a.source){var d=a.data["datawrapper-height"][t]+"px";r.style.height=d}}});</script>
+
+El resultado muestra que, durante los últimos diez años, el salario bruto apenas ha registrado variación real, situándose ligeramente por debajo del nivel de partida, mientras que el precio de la vivienda ha seguido una trayectoria claramente ascendente. En términos acumulados, el incremento del precio de la vivienda se aproxima a los 50 puntos porcentuales. Expresado de forma ilustrativa, un precio medio de 1.600 euros por metro cuadrado en 2015 equivaldría a unos 2.400 euros por metro cuadrado en 2025. Dentro de esa evolución, destaca además la aceleración observada en los dos últimos años.
+
+Esta comparación permite situar en un mismo marco dos variables que afectan de forma directa a las condiciones materiales de acceso a la vivienda. A partir de ahí, se abre la posibilidad de relacionar esta evolución con otros procesos sociales y económicos que afectan a la población joven, como el retraso en la emancipación, los cambios en los itinerarios formativos o las decisiones vinculadas a la vida familiar.
+
+En este sentido, la cuestión enlaza con el reportaje de *El País* [Los jóvenes son más de derechas que nunca. Estas son sus razones](https://elpais.com/eps/2025-11-02/los-jovenes-son-mas-de-derechas-que-nunca-estas-son-sus-razones.html){target="_blank" rel="noopener noreferrer"}, que parte de un análisis previo sobre las principales preocupaciones de la población joven y utiliza ese punto de partida para articular el resto de la pieza.
+
+## Metodología
+
+Para ello, se han utilizado datos publicados por el INE:
+
+-   **Encuesta trimestral de coste laboral. Resultado por Comunidades autónomas (desde el trimestre 1/2008)**\
+    _Coste laboral por trabajador, comunidad autónoma, sectores de actividad: coste laboral ordinario_\
+    Fuente original: [https://www.ine.es/up/bpJBIvlmiG](https://www.ine.es/up/bpJBIvlmiG){target="_blank" rel="noopener noreferrer"}\
+    Excel resultante: [https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/coste_laboral_por_trabajador_ccaa_2025-2015.%20Base%202015.xlsx](https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/coste_laboral_por_trabajador_ccaa_2025-2015.%20Base%202015.xlsx){target="_blank" rel="noopener noreferrer"}
+
+-   **Índice de Precios de Vivienda (IPV). Base 2015**\
+    _Índices por CCAA: general, vivienda nueva y de segunda mano_\
+    Fuente original: [https://www.ine.es/up/KZ3wpREDi29](https://www.ine.es/up/KZ3wpREDi29){target="_blank" rel="noopener noreferrer"}\
+    Excel resultante: [https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/ipv_coste_laboral_terminos_reales_ccaa_2025-2015.%20Base%202015.xlsx](https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/ipv_coste_laboral_terminos_reales_ccaa_2025-2015.%20Base%202015.xlsx){target="_blank" rel="noopener noreferrer"}
+
+-   **IPC. Índice de Precios de Consumo. Base 2025**\
+    _Índices nacionales: general y de grupos ECOICOP ver.2_
+    Fuente original: [https://www.ine.es/up/EYMj8BmiiG](https://www.ine.es/up/EYMj8BmiiG){target="_blank" rel="noopener noreferrer"}\
+    Excel utilizado para la extracción: [https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/%C3%ADndice_precios_consumo_2025-2015.%20Base%202025.xlsx](https://github.com/phaya/periodismo-de-datos/raw/refs/heads/main/data/%C3%ADndice_precios_consumo_2025-2015.%20Base%202025.xlsx){target="_blank" rel="noopener noreferrer"}
+
+A partir de estas tablas se construye un dataset trimestral para el periodo 2015–2025, con información desagregada por comunidad autónoma. El proceso consiste en descargar los ficheros originales, revisar su estructura y homogeneizar sus formatos para poder trabajar con las tres series de manera conjunta.
+
+En el caso del coste laboral, se reorganizan las cabeceras, se identifica la columna de comunidad autónoma, se eliminan las filas que no contienen observaciones y la tabla se transforma a formato largo (tidy), generando un registro por comunidad y trimestre. Posteriormente, los valores se convierten a formato numérico y se exportan a un fichero final reutilizable.
+
+Una vez preparadas las tres fuentes, los indicadores de salario y vivienda se deflactan mediante el IPC, de modo que la comparación se realiza en términos reales. Posteriormente, ambas series se expresan como índices con base en 2015T1 = 100, lo que permite medir su evolución relativa desde ese momento inicial y representarlas en una misma gráfica.

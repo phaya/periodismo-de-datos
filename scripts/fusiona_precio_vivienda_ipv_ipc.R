@@ -1,6 +1,21 @@
-# ============================================================
-# ÍNDICES DE VIVIENDA Y COSTE LABORAL EN TÉRMINOS REALES (BASE 2015)
-# ============================================================
+# ------------------------------------------------------------
+# Este script calcula índices trimestrales reales de precios
+# de la vivienda y de coste laboral por comunidad autónoma para
+# el período 2015–2025. Ambos indicadores se deflactan mediante
+# el IPC y se expresan como índices con base 2015 (2015T1 = 100),
+# permitiendo analizar su evolución en términos reales.
+#
+# FUNCIONALIDAD
+# 1. Lee el IPC mensual y lo transforma en IPC trimestral
+#    (índice general), rebasándolo a base 2015.
+# 2. Lee el índice de precios de la vivienda y el coste laboral
+#    por trabajador.
+# 3. Deflacta ambas series utilizando el IPC y las convierte
+#    en índices reales con base 2015 por comunidad autónoma.
+# 4. Integra los resultados en una única base de datos y los
+#    guarda en un archivo Excel.
+# ------------------------------------------------------------
+
 library(tidyverse)
 library(readxl)
 library(lubridate)

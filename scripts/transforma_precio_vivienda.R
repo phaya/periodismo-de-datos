@@ -2,8 +2,12 @@
 # Script de preparación y normalización de datos de coste laboral
 # por trabajador y comunidades autónomas (INE, 2015–2025).
 # --------------------------------------------------------------
-# Este script transforma la tabla original del INE en un formato tidy
-# listo para su análisis y visualización.
+# Este script calcula índices trimestrales reales de precios
+# de la vivienda y de coste laboral por comunidad autónoma para
+# el período 2015–2025. Ambos indicadores se deflactan mediante
+# el IPC y se expresan como índices con base 2015 (2015T1 = 100),
+# permitiendo analizar su evolución en términos reales.
+#
 #
 # FUNCIONALIDAD:
 # - Lee el fichero Excel original del INE con datos de coste laboral

@@ -10,6 +10,7 @@
 # - Lee un fichero CSV con datos históricos de PIB.
 # - Filtra los datos para los países definidos en los parámetros.
 # - Limita el rango temporal entre el año inicial y final especificados.
+# - Cambia de formato largo a ancho para tener una columna por pais.
 # - Exporta el resultado a un fichero Excel reutilizable.
 #
 # RESULTADO:
@@ -95,9 +96,21 @@ df_raw <- read.csv(archivo_entrada)
 # ---------------------------------------------
 # 2. Filtrar países y años
 # ---------------------------------------------
-df_final <- df_raw %>%
+df_filtrado <- df_raw %>%
   filter(Entity %in% paises) %>%
   filter(Year >= anio_inicio, Year <= anio_fin)
+
+
+# ---------------------------------------------
+# 3. Transformar a formato ancho (columnas por país)
+# ---------------------------------------------
+df_final <- df_filtrado %>%
+  select(Entity, Year, GDP) %>% 
+  pivot_wider(
+    names_from = Entity,
+    values_from = GDP
+  ) %>%
+  arrange(Year)
 
 # ---------------------------------------------
 # 3. Exportar resultado
